@@ -1,0 +1,179 @@
+diff --git a/Makefile.in b/Makefile.in
+index 0268629..22ad72e 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -85,10 +85,11 @@ VPATH := $(addprefix $(src_dir)/, $(sprojs_enabled))
+ CC            := @CC@
+ READELF       := @READELF@
+ OBJCOPY       := @OBJCOPY@
+-CFLAGS        := @CFLAGS@ $(CFLAGS) -DBBL_PAYLOAD=\"bbl_payload\" -DBBL_LOGO_FILE=\"bbl_logo_file\"
++CFLAGS        := @CFLAGS@ $(CFLAGS) -g -DBBL_PAYLOAD=\"bbl_payload\" -DBBL_LOGO_FILE=\"bbl_logo_file\" -DDTB=\"dtb\"
+ BBL_PAYLOAD   := @BBL_PAYLOAD@
+ COMPILE       := $(CC) -MMD -MP $(CFLAGS) \
+                  $(sprojs_include)
++DTB	     :=  ../../conf/shakti.dts
+ # Linker
+ #  - LDFLAGS : Flags for the linker (eg. -L)
+ #  - LIBS    : Library flags (eg. -l)
+diff --git a/bbl/bbl.ac b/bbl/bbl.ac
+index 80d3b06..90e1fe4 100644
+--- a/bbl/bbl.ac
++++ b/bbl/bbl.ac
+@@ -1,7 +1,11 @@
+ AC_ARG_ENABLE([logo], AS_HELP_STRING([--enable-logo], [Enable boot logo]))
++AC_ARG_ENABLE([dts], AS_HELP_STRING([--enable-dts], [Enable dts]))
+ AS_IF([test "x$enable_logo" == "xyes"], [
+   AC_DEFINE([PK_ENABLE_LOGO],,[Define if the RISC-V logo is to be displayed])
+ ])
++AS_IF([test "x$enable_dts" == "xyes"], [
++  AC_DEFINE([PK_ENABLE_DTS],,[DTS Enable])
++])
+ 
+ AC_ARG_WITH([payload], AS_HELP_STRING([--with-payload], [Set ELF payload for bbl]),
+   [AC_SUBST([BBL_PAYLOAD], $with_payload, [Kernel payload for bbl])],
+diff --git a/bbl/bbl.mk.in b/bbl/bbl.mk.in
+index 2bc96e1..02255c0 100644
+--- a/bbl/bbl.mk.in
++++ b/bbl/bbl.mk.in
+@@ -14,7 +14,10 @@ bbl_asm_srcs = \
+   payload.S \
+   raw_logo.S \
+ 
+-payload.o: bbl_payload
++
++dtb: $(DTB)
++	dtc -O dtb -o dtb -b 0 < $<
++payload.o:dtb bbl_payload
+ 
+ bbl_payload: $(BBL_PAYLOAD)
+ 	if $(READELF) -h $< 2> /dev/null > /dev/null; then $(OBJCOPY) -O binary $< $@; else cp $< $@; fi
+diff --git a/config.h.in b/config.h.in
+index 4674a2e..c406617 100644
+--- a/config.h.in
++++ b/config.h.in
+@@ -36,6 +36,9 @@
+ /* Define if the RISC-V logo is to be displayed */
+ #undef PK_ENABLE_LOGO
+ 
++/* Define if the DTS explicitly given */
++#undef PK_ENABLE_DTS
++
+ /* Define if virtual memory support is enabled */
+ #undef PK_ENABLE_VM
+ 
+diff --git a/configure b/configure
+index 61c0292..8caf93d 100755
+--- a/configure
++++ b/configure
+@@ -593,6 +593,8 @@ subprojects
+ BBL_LOGO_FILE
+ BBL_PAYLOAD
+ install_subdir
++BUILD_ABI
++BUILD_ARCH
+ RISCV
+ EGREP
+ GREP
+@@ -669,11 +671,14 @@ ac_subst_files=''
+ ac_user_opts='
+ enable_option_checking
+ enable_stow
++with_target_isa
++with_target_abi
+ enable_32bit
+ enable_print_device_tree
+ enable_optional_subprojects
+ enable_vm
+ enable_logo
++enable_dts
+ with_payload
+ with_logo
+ enable_fp_emulation
+@@ -1325,11 +1330,14 @@ Optional Features:
+                           Enable all optional subprojects
+   --disable-vm            Disable virtual memory
+   --enable-logo           Enable boot logo
++  --enable-dts            Enable dts
+   --disable-fp-emulation  Disable floating-point emulation
+ 
+ Optional Packages:
+   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
++  --with-target-isa       Specify the target architecture
++  --with-target-abi       Specify the target abi
+   --with-payload          Set ELF payload for bbl
+   --with-logo             Specify a better logo
+ 
+@@ -4073,6 +4081,29 @@ fi
+ 
+ default_CFLAGS="-Wall -Werror -D__NO_INLINE__ -mcmodel=medany -O2 -std=gnu99 -Wno-unused -Wno-attributes -fno-delete-null-pointer-checks"
+ 
+@@ -4237,6 +4268,11 @@ if test "${enable_logo+set}" = set; then :
+   enableval=$enable_logo;
+ fi
+ 
++# Check whether --enable-dts was given.
++if test "${enable_dts+set}" = set; then :
++  enableval=$enable_dts;
++fi
++
+ if test "x$enable_logo" == "xyes"; then :
+ 
+ 
+@@ -4244,6 +4280,13 @@ $as_echo "#define PK_ENABLE_LOGO /**/" >>confdefs.h
+ 
+ 
+ fi
++if test "x$enable_dts" == "xyes"; then :
++
++
++$as_echo "#define PK_ENABLE_DTS /**/" >>confdefs.h
++
++
++fi
+ 
+ 
+ # Check whether --with-payload was given.
+diff --git a/machine/mentry.S b/machine/mentry.S
+index 11c053c..61aaa9a 100644
+--- a/machine/mentry.S
++++ b/machine/mentry.S
+@@ -2,6 +2,7 @@
+ 
+ #include "mtrap.h"
+ #include "bits.h"
++#include "config.h"
+ 
+   .data
+   .align 6
+@@ -295,8 +296,13 @@ do_reset:
+ #endif
+   wfi
+   j .LmultiHart
+-
++#ifdef PK_ENABLE_DTS
++  .globl _dtb
++_dtb:
++  .incbin DTB
++#endif
+   .bss
+   .align RISCV_PGSHIFT
+ stacks:
+   .skip RISCV_PGSIZE * MAX_HARTS
++
+diff --git a/machine/minit.c b/machine/minit.c
+index 3623f38..9edefec 100644
+--- a/machine/minit.c
++++ b/machine/minit.c
+@@ -139,7 +139,11 @@ static void wake_harts()
+ 
+ void init_first_hart(uintptr_t hartid, uintptr_t dtb)
+ {
+-  // Confirm console as early as possible
++ #ifdef PK_ENABLE_DTS
++ extern char _dtb;
++  dtb=(uintptr_t) &_dtb;
++ #endif
++// Confirm console as early as possible
+   query_uart(dtb);
+   query_htif(dtb);

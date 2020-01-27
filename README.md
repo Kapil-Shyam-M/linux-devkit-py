@@ -54,7 +54,7 @@ Getting started on linux Devlopment
 --
 The linux development repository uses submodules. You need the --recursive option to fetch the submodules automatically
             
-            $ git clone --recursive https://gitlab.com/shaktiproject/software/linux-devkit.git
+     $ git clone --recursive https://gitlab.com/shaktiproject/software/linux-devkit.git
             
 The development package Supports C-Class 64bit Core,which boots linux on top of Proxy Kernel.
 

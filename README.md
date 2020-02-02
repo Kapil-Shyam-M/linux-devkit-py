@@ -52,8 +52,10 @@ Once the above steps are completed you can find the cross-compile and baremetal 
 
 Getting started on linux Devlopment
 --
-
-
+The linux development repository uses submodules. You need the --recursive option to fetch the submodules automatically
+            
+     $ git clone --recursive https://gitlab.com/shaktiproject/software/linux-devkit.git
+            
 The development package Supports C-Class 64bit Core,which boots linux on top of Proxy Kernel.
 
 Rapid deployment using BBL as a bootloader
@@ -87,7 +89,7 @@ Extract the verilog-artifacts
 Copy the bbl binary and start the simulation.
 
     $ cd verilog-artifacts/sim  
-    $ cp $SHAKTI_LINUX/work/riscv-pk/bbl ./  
+    $ cp <linux-dev location>/work/riscv-pk/build/bbl ./  
     $ elf2hex 8 33554432 bbl 2147483648 > code.mem  
     $ ./cclass
 
@@ -95,8 +97,7 @@ The output will be gernerated in a text file "app_log" , make use of tail method
 
 Sample Debug Log 
 ---
-![linux](/uploads/1f9318ce1087e9cff86ce890b07bfd9d/linux.png)
-
+![linux](/uploads/63810269b0afd43ab87609a134e71152/linux.png)
 
 
 

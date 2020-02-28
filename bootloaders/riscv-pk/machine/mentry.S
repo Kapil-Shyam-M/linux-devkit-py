@@ -222,7 +222,7 @@ do_reset:
   li x8, 0
   li x9, 0
 // save a0 and a1; arguments from previous boot loader stage:
-//  li x10, 0
+  li x10, 0
 //  li x11, 0
   li x12, 0
   li x13, 0

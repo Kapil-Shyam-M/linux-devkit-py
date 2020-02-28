@@ -19,7 +19,8 @@ config TARGET_QEMU_VIRT
 
 config TARGET_SIFIVE_FU540
 	bool "Support SiFive FU540 Board"
-
+config TARGET_SHAKTI_CCLASS
+	bool "Support Shakti C Class"
 endchoice
 
 config SYS_ICACHE_OFF

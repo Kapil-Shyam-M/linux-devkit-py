@@ -29,10 +29,45 @@ register char a0 asm("a0") = ch;
 }
 int uart_getchar()
 {
-  int8_t ch = uart[UART_REG_RXFIFO];
-  if (ch <= 0 || ch>127) return -1;
-  return ch;
+	int8_t charc;
+	charc=0;	
+	 register char a0 asm("a0")=charc;
+	//register char a0 asm("a0");
+  if (charc <= 0 || charc>127) return -1;
 
+//register char a0 asm("a0")=ch;
+register int a1 asm("a1") = 0;
+       asm volatile ("li t1, 0x11300" "\n\t" //The base address of UART config registers
+           		  	"uart_statusr: lb t2, 12(t1)" "\n\t"
+    				"andi t2, t2, 0x8" "\n\t"
+	    			"beqz t2, uart_statusr" "\n\t"
+                    "lb a0, 8(t1)"  "\n\t"      //The base address of UART data register
+                    :
+                    :
+                    :"a0","t1","t2","cc","memory");
+
+
+   return a0;
+
+ 
+//  ch = uart[UART_REG_RXFIFO];
+//  return ch;
+
+
+/*	register char a0 asm("a0");
+ register int a1 asm("a1") = 0;
+       asm volatile ("li t1, 0x11300" "\n\t" //The base address of UART config registers
+           		  	"uart_statusr: lb t2, 12(t1)" "\n\t"
+    				"andi t2, t2, 0x8" "\n\t"
+	    			"beqz t2, uart_statusr" "\n\t"
+                    "lb a0, 8(t1)"  "\n\t"      //The base address of UART data register
+                    :
+                    :
+                    :"a0","t1","t2","cc","memory");
+
+
+   return a0;
+*/
 }
 
 struct uart_scan
@@ -66,7 +101,6 @@ static void uart_done(const struct fdt_scan_node *node, void *extra)
   uart = (void*)(uintptr_t)scan->reg;
   //uart[UART_REG_TXCTRL] = UART_TXEN;
  // uart[UART_REG_RXCTRL] = UART_RXEN;
-
    asm volatile (
         "uart_end: li t1, 0x11300" "\n\t"	//The base address of UART config registers
         "lb a0, 12(t1)" "\n\t"
@@ -75,6 +109,7 @@ static void uart_done(const struct fdt_scan_node *node, void *extra)
 				:
 				:
 				:"a0","t1","cc","memory");
+
 
 
 }

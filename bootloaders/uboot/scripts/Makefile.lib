@@ -382,9 +382,9 @@ cmd_efi_objcopy = $(OBJCOPY) -j .header -j .text -j .sdata -j .data -j \
 
 $(obj)/%.efi: $(obj)/%_efi.so
 	$(call cmd,efi_objcopy)
-
+#Removed shared support here
 quiet_cmd_efi_ld = LD      $@
-cmd_efi_ld = $(LD) -nostdlib -znocombreloc -T $(EFI_LDS_PATH) -shared \
+cmd_efi_ld = $(LD) -nostdlib -znocombreloc -T $(EFI_LDS_PATH)  \
 		-Bsymbolic -s $^ -o $@
 
 EFI_LDS_PATH = $(srctree)/arch/$(ARCH)/lib/$(EFI_LDS)

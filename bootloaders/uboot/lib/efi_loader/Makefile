@@ -12,14 +12,14 @@ ccflags-y += -DHOST_ARCH="$(HOST_ARCH)"
 CFLAGS_efi_boottime.o += \
   -DFW_VERSION="0x$(VERSION)" \
   -DFW_PATCHLEVEL="0x$(PATCHLEVEL)"
-CFLAGS_helloworld.o := $(CFLAGS_EFI) -Os -ffreestanding
-CFLAGS_REMOVE_helloworld.o := $(CFLAGS_NON_EFI)
+#CFLAGS_helloworld.o := $(CFLAGS_EFI) -Os -ffreestanding
+#CFLAGS_REMOVE_helloworld.o := $(CFLAGS_NON_EFI)
 
-ifneq ($(CONFIG_CMD_BOOTEFI_HELLO_COMPILE),)
-always += helloworld.efi
-endif
+#ifneq ($(CONFIG_CMD_BOOTEFI_HELLO_COMPILE),)
+#always += helloworld.efi
+#endif
 
-obj-$(CONFIG_CMD_BOOTEFI_HELLO) += helloworld_efi.o
+#obj-$(CONFIG_CMD_BOOTEFI_HELLO) += helloworld_efi.o
 obj-y += efi_bootmgr.o
 obj-y += efi_boottime.o
 obj-y += efi_console.o

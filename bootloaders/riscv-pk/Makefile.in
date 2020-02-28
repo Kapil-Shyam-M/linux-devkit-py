@@ -89,7 +89,7 @@ CFLAGS        := @CFLAGS@ $(CFLAGS)  -DBBL_PAYLOAD=\"bbl_payload\" -DBBL_LOGO_FI
 BBL_PAYLOAD   := @BBL_PAYLOAD@
 COMPILE       := $(CC) -MMD -MP $(CFLAGS) \
                  $(sprojs_include)
-DTB	     :=  ../../../bsp/dts/shakti.dts
+DTB	     :=  ../../../bsp/dts/shakti_100t.dts
 # Linker
 #  - LDFLAGS : Flags for the linker (eg. -L)
 #  - LIBS    : Library flags (eg. -l)

@@ -28,14 +28,16 @@
 
 RISCV ?=/opt/riscv
 PATH := $(RISCV)/bin:$(PATH)
-ISA ?= rv64imafdc
+ISA ?= rv64imac
 ABI ?= lp64d
 
 srcdir := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 srcdir := $(srcdir:/=)
 confdir := $(srcdir)/bsp/conf
 wrkdir := $(CURDIR)/work
-buildroot_srcdir := $(srcdir)/buildroot
+bloaddir :=$(srcdir)/bootloaders
+##### BUILDROOT RELATED CONFIGS ################################################
+buildroot_srcdir := $(srcdir)/buildroot                           
 buildroot_initramfs_wrkdir := $(wrkdir)/buildroot_initramfs
 buildroot_initramfs_tar := $(buildroot_initramfs_wrkdir)/images/rootfs.tar
 buildroot_initramfs_config := $(confdir)/buildroot_initramfs_config
@@ -44,20 +46,30 @@ buildroot_initramfs_sysroot := $(wrkdir)/buildroot_initramfs_sysroot
 buildroot_rootfs_wrkdir := $(wrkdir)/buildroot_rootfs
 buildroot_rootfs_ext := $(buildroot_rootfs_wrkdir)/images/rootfs.ext4
 buildroot_rootfs_config := $(confdir)/buildroot_rootfs_config
+##############################################################################
 
+###### U-BOOT RELATED CONFIGS ##################################################
+uboot_config:=shakti_uboot_defconfig
+uboot_dir:=$(bloaddir)/uboot
+uboot_wrkdir:=$(wrkdir)/uboot
+uboot_bin:=$(uboot_wrkdir)/uboot.bin
+################################################################################
+
+######## LINUX RELATED CONFIGS #################################################
 linux_srcdir := $(srcdir)/linux-on-shakti
 linux_wrkdir := $(wrkdir)/linux
 linux_defconfig := $(confdir)/shakti_defconfig
-
 vmlinux := $(linux_wrkdir)/vmlinux
 vmlinux_stripped := $(linux_wrkdir)/vmlinux-stripped
+###############################################################################
 
+######## Proxy Kernel(BBL) RELATED CONFIGS ####################################
 pk_srcdir := $(srcdir)/bootloaders/riscv-pk
 pk_wrkdir := $(wrkdir)/riscv-pk
 bbl := $(pk_wrkdir)/bbl
 bin := $(wrkdir)/bbl.bin
 hex := $(wrkdir)/bbl.hex
-
+##############################################################################
 
 rootfs := $(wrkdir)/rootfs.bin
 
@@ -135,6 +147,17 @@ $(vmlinux): $(linux_srcdir) $(linux_wrkdir)/.config $(buildroot_initramfs_sysroo
 $(vmlinux_stripped): $(vmlinux)
 	$(target)-strip -o $@ $<
 
+.PHONY : uboot_cclass
+uboot_cclass:$(uboot_dir) 
+		$(MAKE) -C $< O=$(uboot_wrkdir) \
+       			CROSS_COMPILE=$(RISCV)/bin/riscv64-unknown-elf- \
+ 			ARCH=riscv \
+			$(uboot_config)		
+		$(MAKE) -C $< O=$(uboot_wrkdir) \
+			 CROSS_COMPILE=$(RISCV)/bin/riscv64-unknown-elf- \
+ 			 ARCH=riscv \
+			 -j4
+
 .PHONY: linux-menuconfig
 linux-menuconfig: $(linux_wrkdir)/.config
 	$(MAKE) -C $(linux_srcdir) O=$(dir $<) ARCH=riscv menuconfig
@@ -158,7 +181,7 @@ $(bin): $(pk_wrkdir)/build/bbl
 $(rootfs): $(buildroot_rootfs_ext)
 	cp $< $@
 
-.PHONY: buildroot_initramfs_sysroot vmlinux bbl
+.PHONY: buildroot_initramfs_sysroot vmlinux bbl 
 buildroot_initramfs_sysroot: $(buildroot_initramfs_sysroot)
 vmlinux: $(vmlinux)
 bbl: $(bbl)

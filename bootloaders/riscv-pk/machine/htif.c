@@ -98,13 +98,27 @@ void htif_console_putchar(uint8_t ch)
   spinlock_lock(&htif_lock);
  __set_tohost(1, 1, ch);
   spinlock_unlock(&htif_lock);
-/*  register char a0 asm("a0") = ch;
+  /*register char a0 asm("a0") = ch;
   asm volatile ("li t1, 0x11300" "\n\t"    //The base address of UART config registers
                 "sb a0, 0(t1)"  "\n\t"
                 :
                 :
                 :"a0","t1","cc","memory");
 */
+  register char a0 asm("a0")=ch;
+register int a1 asm("a1") = 0;
+       asm volatile ("li t1, 0x11300" "\n\t" //The base address of UART config registers
+                                "uart_statusr: lb t2, 12(t1)" "\n\t"
+                                "andi t2, t2, 0x8" "\n\t"
+                                "beqz t2, uart_statusr" "\n\t"
+                    "lb a0, 8(t1)"  "\n\t"      //The base address of UART data register
+                    :
+                    :
+                    :"a0","t1","t2","cc","memory");
+
+
+  // return a0;
+
 }
 
 void htif_poweroff()

@@ -29,29 +29,28 @@ register char a0 asm("a0") = ch;
 }
 int uart_getchar()
 {
-	int8_t charc;
-	charc=0;	
-	 register char a0 asm("a0")=charc;
-	//register char a0 asm("a0");
-  if (charc <= 0 || charc>127) return -1;
 
-//register char a0 asm("a0")=ch;
+register char a0 asm("a0");
 register int a1 asm("a1") = 0;
+
        asm volatile ("li t1, 0x11300" "\n\t" //The base address of UART config registers
            		  	"uart_statusr: lb t2, 12(t1)" "\n\t"
     				"andi t2, t2, 0x8" "\n\t"
-	    			"beqz t2, uart_statusr" "\n\t"
+	    			"bnez t2, uart_statusr" "\n\t"
                     "lb a0, 8(t1)"  "\n\t"      //The base address of UART data register
                     :
                     :
                     :"a0","t1","t2","cc","memory");
 
 
+//uart_putchar("h");
+//uart_putchar("i");
+
    return a0;
 
- 
-//  ch = uart[UART_REG_RXFIFO];
-//  return ch;
+ // int8_t ch; 
+ // ch = uart[UART_REG_RXFIFO];
+ // return ch;
 
 
 /*	register char a0 asm("a0");
@@ -65,8 +64,8 @@ register int a1 asm("a1") = 0;
                     :
                     :"a0","t1","t2","cc","memory");
 
-
-   return a0;
+ch=a0;
+   return ch;
 */
 }
 

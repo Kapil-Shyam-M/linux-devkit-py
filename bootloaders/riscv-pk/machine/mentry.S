@@ -271,7 +271,9 @@ do_reset:
   # set MSIE bit to receive IPI
   li a2, MIP_MSIP
   csrw mie, a2
-
+  #Disabled MIE by John 
+  li t0, 8
+  csrrs   zero, mstatus, t0
 .LmultiHart:
 #if MAX_HARTS > 1
   # wait for an IPI to signal that it's safe to boot

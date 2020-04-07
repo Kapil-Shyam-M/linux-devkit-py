@@ -151,7 +151,7 @@ void init_first_hart(uintptr_t hartid, uintptr_t dtb)
 	(*((int *)bss_s))=0;
 // Confirm console as early as possible
   query_uart(dtb); //uncomment ot fpga to work
-  //query_htif(dtb);  //comment it to make fpga work
+ // query_htif(dtb);  //comment it to make fpga work
 
   hart_init();
   hls_init(0); // this might get called again from parse_config_string
@@ -184,7 +184,7 @@ void enter_supervisor_mode(void (*fn)(uintptr_t), uintptr_t arg0, uintptr_t arg1
 {
   // Set up a PMP to permit access to all of memory.
   // Ignore the illegal-instruction trap if PMPs aren't supported.
-  uintptr_t pmpc = PMP_NAPOT | PMP_R | PMP_W | PMP_X;
+ /* uintptr_t pmpc = PMP_NAPOT | PMP_R | PMP_W | PMP_X;
   asm volatile ("la t0, 1f\n\t"
                 "csrrw t0, mtvec, t0\n\t"
                 "csrw pmpaddr0, %1\n\t"
@@ -192,7 +192,8 @@ void enter_supervisor_mode(void (*fn)(uintptr_t), uintptr_t arg0, uintptr_t arg1
                 ".align 2\n\t"
                 "1: csrw mtvec, t0\n\t"
                 : : "r" (pmpc), "r" (-1UL) : "t0");
-
+*/
+ 
   uintptr_t mstatus = read_csr(mstatus);
   mstatus = INSERT_FIELD(mstatus, MSTATUS_MPP, PRV_S);
   mstatus = INSERT_FIELD(mstatus, MSTATUS_MPIE, 0);

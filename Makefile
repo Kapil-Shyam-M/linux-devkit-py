@@ -28,7 +28,7 @@
 
 RISCV ?=/opt/riscv
 PATH := $(RISCV)/bin:$(PATH)
-ISA ?= rv64imac
+ISA ?= rv64imafdc
 ABI ?= lp64d
 
 srcdir := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -180,6 +180,23 @@ $(bin): $(pk_wrkdir)/build/bbl
 	
 $(rootfs): $(buildroot_rootfs_ext)
 	cp $< $@
+
+.PHONY:bbl_minimal
+bbl_minimal: $(linux_srcdir) $(linux_wrkdir)/.config 
+		$(MAKE) -C $< O=$(linux_wrkdir) \	
+		CROSS_COMPILE=$(RISCV)/bin/riscv64-unknown-linux-gnu- \
+                CONFIG_INITRAMFS_SOURCE="$(confdir)/initramfs.cpio.gz" \
+                CONFIG_INITRAMFS_ROOT_UID=$(shell id -u) \
+                CONFIG_INITRAMFS_ROOT_GID=$(shell id -g) \
+                ARCH=riscv \
+                vmlinux
+
+(bbl): $(pk_srcdir) $(vmlinux_stripped)
+	rm -rf $(pk_wrkdir)
+	mkdir -p $(pk_wrkdir)
+	cd $(pk_srcdir) && ./build.sh ./build $(vmlinux_stripped)
+	cp -R $(pk_srcdir)/build $(pk_wrkdir)
+
 
 .PHONY: buildroot_initramfs_sysroot vmlinux bbl 
 buildroot_initramfs_sysroot: $(buildroot_initramfs_sysroot)

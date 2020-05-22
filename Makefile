@@ -28,8 +28,8 @@
 
 RISCV ?=/opt/riscv
 PATH := $(RISCV)/bin:$(PATH)
-ISA ?= rv64imafdc
-ABI ?= lp64d
+ISA ?= rv64imac
+ABI ?= lp64
 
 srcdir := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 srcdir := $(srcdir:/=)

@@ -11,6 +11,6 @@ cd ${PKBUILDDIR} && ${PKROOT}/configure \
         --enable-dts \
         --with-logo=${PKROOT}/shakti_logo.txt \
         --with-target-isa=rv64imac \
-        --with-target-abi=lp64c \
+        --with-target-abi=lp64 \
         --enable-print-device-tree
 make -C ${PKBUILDDIR} -j32

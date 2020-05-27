@@ -258,6 +258,16 @@ do_reset:
   slli a2, a3, RISCV_PGSHIFT
   add sp, sp, a2
 
+#added code to zero bss by default
+  # Zero out BSS; linker script provides alignment and padding
+  la t0, __bss_s
+  la t1, __bss_e
+  beq t0, t1, 2f
+1:sw zero, 0(t0)
+  addi t0, t0, 4
+  bne t0, t1, 1b
+2:
+
   # Boot on the first unmasked hart
   la a4, disabled_hart_mask
   LOAD a4, 0(a4)
@@ -271,9 +281,6 @@ do_reset:
   # set MSIE bit to receive IPI
   li a2, MIP_MSIP
   csrw mie, a2
-  #Disabled MIE by John 
-  li t0, 8
-  csrrs   zero, mstatus, t0
 .LmultiHart:
 #if MAX_HARTS > 1
   # wait for an IPI to signal that it's safe to boot

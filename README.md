@@ -104,30 +104,38 @@ Currently the linux kernel boots on ARTY A7 100t with C-Class which can be obtai
 Assuming you have programmed the board and ready to deploy the bbl follow the below steps.
 
 * Connect to the board using openocd 
-    ./openocd -f <path-to-script>/ftdi.cfg
+
+        ./openocd -f <path-to-location>/ftdi.cfg 
+
 
 * Connect to gtkterm or miniterm with a baudrate of 9600 and port as /dev/ttyUSB0
 
 * Using gdb(riscv64-unknown-elf-gdb) load the bbl , steps are given below.
 
-    target remote :3333
-    set remotetimeout unlimited
-    file <path-to-bbl>
-    load
+      target remote :3333
+      set remotetimeout unlimited
+      file <path-to-bbl>
+      load
 
 * Once done inspect the memory at 0x80000000 to check if the image is loaded properly. Hit Continue 
 
-    x/10x 0x80000000
-Sample image showing the same.
-![image](/uploads/af66ace6d24e874a9cd1cae44e1cb477/image.png)
+      x/10x 0x80000000
 
-* login details are 
-    Login ID : root
-    Password : shakti
+Sample image showing the same
+
+![loads](https://user-images.githubusercontent.com/31366212/83849409-ff30a880-a72c-11ea-8fe8-365b1a0181bd.png)
+
+
+* Login details are 
+
+      Login ID : root
+      Password : shakti
+    
 * One can use "adduser" to add new users .
 
-Linux with minimal filesystem.
-![image](/uploads/c5cb7f750a0fb1d961b821339a88f616/image.png)
+Linux with minimal filesystem
+-----
+![file](https://user-images.githubusercontent.com/31366212/83849300-d6a8ae80-a72c-11ea-92e2-11d74d098487.png)
 
 Using Simulator to Boot linux
 -----

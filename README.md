@@ -8,10 +8,10 @@ Salient Features
 ---
 1.  Boots Linux following Version 5.5(Stable)
 2.  Makes use of the following Supported Bootloaders such as
-        * Proxy Kernel(BBL)
-        * U-Boot(WIP)
-        * OpenSBI(WIP)
-3.  Builds a standalone filesystem which can be loaded on to a compatible block device such as SDCard
+     - Proxy Kernel(BBL) -> Currently Used.
+     - U-Boot(Work in Progress)
+     - OpenSBI(Work in Progress)
+3.  Builds a standalone filesystem which can be loaded on to a compatible block device such as SDCard(Work in Progress)
 
 Getting Started
 ---

@@ -183,4 +183,6 @@ void query_htif(uintptr_t fdt)
                  :
                  :
                  :"x0","t1","t2", "cc", "memory");
-*/}
+*/
+    
+}

@@ -108,7 +108,7 @@ Assuming you have programmed the board and ready to deploy the bbl follow the be
         ./openocd -f <path-to-location>/ftdi.cfg 
 
 
-* Connect to gtkterm or miniterm with a baudrate of 9600 and port as /dev/ttyUSB0
+* Connect to gtkterm or minicom with a baudrate of 9600 and port as /dev/ttyUSB0
 
 * Using gdb(riscv64-unknown-elf-gdb) load the bbl , steps are given below.
 

@@ -30,43 +30,10 @@ register char a0 asm("a0") = ch;
 int uart_getchar()
 {
 
-register char a0 asm("a0");
-register int a1 asm("a1") = 0;
+  uint8_t ch = uart[UART_REG_RXFIFO];
+  if (ch <= 0 || ch>127) return -1;
+  return ch;
 
-       asm volatile ("li t1, 0x11300" "\n\t" //The base address of UART config registers
-           		  	"uart_statusr: lb t2, 12(t1)" "\n\t"
-    				"andi t2, t2, 0x8" "\n\t"
-	    			"bnez t2, uart_statusr" "\n\t"
-                    "lb a0, 8(t1)"  "\n\t"      //The base address of UART data register
-                    :
-                    :
-                    :"a0","t1","t2","cc","memory");
-
-
-//uart_putchar("h");
-//uart_putchar("i");
-
-   return a0;
-
- // int8_t ch; 
- // ch = uart[UART_REG_RXFIFO];
- // return ch;
-
-
-/*	register char a0 asm("a0");
- register int a1 asm("a1") = 0;
-       asm volatile ("li t1, 0x11300" "\n\t" //The base address of UART config registers
-           		  	"uart_statusr: lb t2, 12(t1)" "\n\t"
-    				"andi t2, t2, 0x8" "\n\t"
-	    			"beqz t2, uart_statusr" "\n\t"
-                    "lb a0, 8(t1)"  "\n\t"      //The base address of UART data register
-                    :
-                    :
-                    :"a0","t1","t2","cc","memory");
-
-ch=a0;
-   return ch;
-*/
 }
 
 struct uart_scan

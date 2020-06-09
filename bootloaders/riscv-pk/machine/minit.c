@@ -143,12 +143,6 @@ void init_first_hart(uintptr_t hartid, uintptr_t dtb)
  extern char _dtb;
   dtb=(uintptr_t) &_dtb;
  #endif
- extern uint64_t __bss_s;
-  uint64_t bss_s=(uint64_t) &__bss_s;
- extern uint64_t __bss_e;
-  uint64_t bss_e=(uint64_t) &__bss_e;
-  for(;(bss_s+4)<=bss_e;bss_s+=4)
-	(*((int *)bss_s))=0;
 // Confirm console as early as possible
   query_uart(dtb); //uncomment ot fpga to work
  // query_htif(dtb);  //comment it to make fpga work

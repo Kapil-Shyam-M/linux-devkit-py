@@ -1,3 +1,6 @@
+Under Development - Try at your own risk
+
+
 Linux Development Kit for Shakti SOC'S
 ---
 The Development kit acts a "One Stop" means to build and deploy linux on a specfic Shakti capable SOC.

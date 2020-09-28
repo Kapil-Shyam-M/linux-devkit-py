@@ -65,6 +65,12 @@ bin := $(wrkdir)/bbl.bin
 hex := $(wrkdir)/bbl.hex
 ##############################################################################
 
+######### OpenSBI RELATED CONFIGS ############################################
+opensbi_dir :=$(srcdir)/bootloaders/shakti-opensbi
+opensbi_wrkdir := $(wrkdir)/opensbi
+#############################################################################
+
+
 rootfs := $(wrkdir)/rootfs.bin
 
 target := riscv64-unknown-linux-gnu
@@ -190,6 +196,23 @@ bbl_minimal: $(linux_srcdir) $(linux_wrkdir)/.config
 	mkdir -p $(pk_wrkdir)
 	cd $(pk_srcdir) && ./build.sh ./build $(vmlinux_stripped)
 	cp -R $(pk_srcdir)/build $(pk_wrkdir)
+
+.PHONY: opensbi
+opensbi: $(opensbi_dir) $(buildroot_initramfs_tar)  $(buildroot_initramfs_sysroot_stamp)  $(linux_wrkdir)/.config $(buildroot_initramfs_sysroot)
+	  mkdir -p $(opensbi_dir) 
+	  $(MAKE) -C $(linux_srcdir) O=$(linux_wrkdir) \
+                CROSS_COMPILE=$(RISCV)/bin/riscv64-unknown-linux-gnu- \
+              	CONFIG_INITRAMFS_SOURCE="$(confdir)/initramfs.txt $(buildroot_initramfs_sysroot)" \
+                CONFIG_INITRAMFS_ROOT_UID=$(shell id -u) \
+                CONFIG_INITRAMFS_ROOT_GID=$(shell id -g) \
+                ARCH=riscv
+	  $(MAKE) -C $< O=$(opensbi_wrkdir) \
+		   CROSS_COMPILE=$(RISCV)/bin/riscv64-unknown-elf- \
+		  PLATFORM=generic	\
+		  FW_PAYLOAD_PATH=$(linux_wrkdir)/arch/riscv/boot/Image \
+	  	  FW_PAYLOAD_FDT_PATH=$(confdir)/../dts/shakti_100t.dts
+
+
 
 
 .PHONY: buildroot_initramfs_sysroot vmlinux bbl 

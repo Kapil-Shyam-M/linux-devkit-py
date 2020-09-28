@@ -4,3 +4,9 @@
 [submodule "linux-on-shakti"]
 	path = linux-on-shakti
 	url = https://gitlab.com/shaktiproject/software/linux-on-shakti
+[submodule "bootloaders/shakti-opensbi"]
+	path = bootloaders/shakti-opensbi
+	url = https://gitlab.com/shaktiproject/software/shakti-opensbi
+[submodule "bootloaders/uboot"]
+	path = bootloaders/uboot
+	url = https://gitlab.com/shaktiproject/software/uboot

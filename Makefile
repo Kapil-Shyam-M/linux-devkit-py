@@ -206,11 +206,12 @@ opensbi: $(opensbi_dir) $(buildroot_initramfs_tar)  $(buildroot_initramfs_sysroo
                 CONFIG_INITRAMFS_ROOT_UID=$(shell id -u) \
                 CONFIG_INITRAMFS_ROOT_GID=$(shell id -g) \
                 ARCH=riscv
+	  dtc -I dts -O dtb -o $(confdir)/../dts/shakti_100t.dtb $(confdir)/../dts/shakti_100t.dts
 	  $(MAKE) -C $< O=$(opensbi_wrkdir) \
 		   CROSS_COMPILE=$(RISCV)/bin/riscv64-unknown-elf- \
 		  PLATFORM=generic	\
 		  FW_PAYLOAD_PATH=$(linux_wrkdir)/arch/riscv/boot/Image \
-	  	  FW_PAYLOAD_FDT_PATH=$(confdir)/../dts/shakti_100t.dts
+		  FW_FDT_PATH=$(confdir)/../dts/shakti_100t.dtb
 
 
 

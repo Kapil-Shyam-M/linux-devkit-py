@@ -1,6 +1,3 @@
-Under Development - Try at your own risk
-
-
 Linux Development Kit for Shakti SOC'S
 ---
 The Development kit acts a "One Stop" means to build and deploy linux on a specfic Shakti capable SOC.
@@ -46,16 +43,11 @@ executing the following command should suffice:
 
 To build the Newlib cross-compiler, pick an install path.  If you choose,
 say, `/opt/riscv`, then add `/opt/riscv/bin` to your `PATH` now.  Then, simply
-run the following command:
+run the following commands,	
 
-    ./configure --prefix=/opt/riscv
+    cd riscv-gnu-toolchain
+    ./configure --prefix=/opt/riscv --with-arch=rv64imac --with-abi=lp64 --with-cmodel=medany
     sudo make && sudo make linux
-
-For target specifics such as RV64IMAC use the below
-
-    ./configure --prefix=/opt/riscv --with-arch=rv64imac --with-abi=lp64  --with-cmodel=medany
-    sudo make && sudo make linux
-
 
 Once the above steps are completed you can find the cross-compile and baremetal binaries in the respective path '/opt/riscv/bin' also assuming you have added it to the PATH variable you can proceed to build linux.
 
@@ -70,20 +62,19 @@ The development package Supports C-Class 64bit Core,which boots linux on top of 
 
 Rapid deployment using BBL as a bootloader
 --
-Linux can be built as a payload to BBL by doing the below command.
+Linux can be built as a payload to BBL by doing the below command.   
 
-    make bbl
-
-For intial sucessful builds one needs to change the busybox config as "BR2_PACKAGE_BUSYBOX_CONFIG" is broken in the following path 
-
-Note : This is for target specifics ,for instance Shakti C-Class is based on RV64IMAC. For all extensions(I,M,A,F,D,C) you can skip this step.
+For instance Shakti C-Class is based on RV64IMAC. So alter the config file.
 
     Location : <Your linux-devkit dir>/buildroot/package/busybox/busybox.config
 
     CONFIG_EXTRA_CFLAGS="-g -march=rv64imac -mabi=lp64"
     CONFIG_EXTRA_LDFLAGS="-g -march=rv64imac -mabi=lp64"
 
-Also once the above is done please rebuild it.
+Also once the above is done, please rebuild it.
+
+	cd linux-devkit
+	make bbl
 
 Devlopment Cycle
 -----
@@ -102,32 +93,44 @@ To develop with this kit the following points below must be adhered to.
 
 Using SOC to Boot Linux 
 -----
-Currently the linux kernel boots on ARTY A7 100t with C-Class which can be obtained from [here](https://gitlab.com/shaktiproject/cores/shakti-soc)
+Currently the linux kernel boots on ARTY A7 100t with C-Class.
 
 Assuming you have programmed the board and ready to deploy the bbl follow the below steps.
 
-* Connect to the board using openocd 
+Open Three terminals,
+1. Miniterm	
+2. OpenOcd
+3. RISC-V GDB
 
-        ./openocd -f <path-to-location>/ftdi.cfg 
+* Connect to the board using openocd with shakti-sdk
 
+     $ cd ~/shakti-sdk/bsp/third_party/vajra <br />
+     $ sudo $(which openocd) -f ftdi.cfg <br />
+     
+* Connect to gtkterm or minicom or miniterm with a baudrate of 19200 and port as /dev/ttyUSB
 
-* Connect to gtkterm or minicom with a baudrate of 9600 and port as /dev/ttyUSB0
-
+     $ sudo miniterm.py /dev/ttyUSB1 19200 <br />
+    
 * Using gdb(riscv64-unknown-elf-gdb) load the bbl , steps are given below.
 
-      target remote :3333
-      set remotetimeout unlimited
-      file <path-to-bbl>
-      load
+     ​(gdb) set remotetimeout unlimited <br />
+     (gdb) ​target remote localhost:3333 <br />
+     (gdb) file path/to/linux-devkit/bootloaders/riscv-pk/build/bbl <br />
+     (gdb) load	<br />
 
-* Once done inspect the memory at 0x80000000 to check if the image is loaded properly. Hit Continue 
 
-      x/10x 0x80000000
+* Once done inspect the memory at 0x80000000 to check if the image is loaded properly. 
 
-Sample image showing the same
+     (gdb) x/10x 0x80000000
+
+GDB after load,
 
 ![loads](https://user-images.githubusercontent.com/31366212/83849409-ff30a880-a72c-11ea-8fe8-365b1a0181bd.png)
 
+
+* Hit Continue to get the output. Output is displayed in Serial Monitor (Miniterm).
+
+      (gdb) c  
 
 * Login details are 
 
@@ -136,7 +139,7 @@ Sample image showing the same
     
 * One can use "adduser" to add new users .
 
-Linux with minimal filesystem
+Linux with minimal filesystem (miniterm)
 -----
 ![file](https://user-images.githubusercontent.com/31366212/83849300-d6a8ae80-a72c-11ea-92e2-11d74d098487.png)
 
@@ -176,5 +179,4 @@ Sample Debug Log
 ![linux](/uploads/63810269b0afd43ab87609a134e71152/linux.png)
 
 
-
-
+note: If you have already installed toolchain, please use it appropriately.

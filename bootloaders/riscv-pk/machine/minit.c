@@ -35,7 +35,7 @@ static void mstatus_init()
     write_csr(sptbr, 0);
 }
 
-// send S-mode interrupts and most exceptions straight to S-mode
+// send S-mode intMSTATUS_MPRVerrupts and most exceptions straight to S-mode
 static void delegate_traps()
 {
   if (!supports_extension('S'))
@@ -96,8 +96,14 @@ static void hart_init()
 
 static void plic_init()
 {
-  for (size_t i = 1; i <= plic_ndevs; i++)
+  printm("Entering PLIC Init...\n");
+  for (size_t i = 1; i <= plic_ndevs; i++){
     plic_priorities[i] = 1;
+	printm(" prio = %x \n",plic_priorities[i]);
+  }
+  printm("Address of plic_priority is %p \n",&plic_priorities);
+
+  printm("Exiting PLIC Init...\n");
 }
 
 static void prci_test()
@@ -115,19 +121,40 @@ static void prci_test()
 
 static void hart_plic_init()
 {
+  printm("Inside hart_plic_init() function...\n");
   // clear pending interrupts
   *HLS()->ipi = 0;
   *HLS()->timecmp = -1ULL;
   write_csr(mip, 0);
+  printm("write_csr(mip, 0);\n");
+  write_csr(sstatus,2);
+  write_csr(mstatus, 0xb);
+  write_csr(mie,0xbbb);
+  printm("The value of mstatus register is : %x\n",read_csr(mstatus));
+  printm("The value of mie register is : %x\n",read_csr(mie));
 
   if (!plic_ndevs)
     return;
 
+  printm("if (!plic_ndevs)\n");
+
   size_t ie_words = plic_ndevs / sizeof(uintptr_t) + 1;
-  for (size_t i = 0; i < ie_words; i++)
-    HLS()->plic_s_ie[i] = ULONG_MAX;
-  *HLS()->plic_m_thresh = 1;
-  *HLS()->plic_s_thresh = 0;
+  printm("value of ie_words = %d\n",ie_words);
+
+  for (size_t i = 0; i < ie_words; i++){
+	  printm("Address : %x\n", &(HLS()->plic_s_ie[i]));
+
+	  HLS()->plic_s_ie[i] = 0xffffffff;
+	  printm("HLS()->plic_s_ie[i]\n");
+  }
+
+  *HLS()->plic_s_thresh = 1;
+  printm("The address of priority threshold is %x",HLS()->plic_s_thresh);
+  printm("*HLS()->plic_s_thresh = 1;\n");
+
+/*  *HLS()->plic_s_thresh = 0;
+  printm("*HLS()->plic_s_thresh = 0;\n");
+  */
 }
 
 static void wake_harts()
@@ -154,16 +181,23 @@ void init_first_hart(uintptr_t hartid, uintptr_t dtb)
   query_finisher(dtb);
 
   query_mem(dtb);
+  printm("query_mem(dtb) is to be called...\n");
   query_harts(dtb);
+  printm("query_harts(dtb) is to be called...\n");
   query_clint(dtb);
+  printm("query_plic(dtb) is to be called...\n");
   query_plic(dtb);
 
   wake_harts();
 
+  printm("plic_init() is to be called...\n");
   plic_init();
+  printm("hart_plic_init() is to be called...\n");
   hart_plic_init();
   //prci_test();
+  printm("memory_init() is to be called...\n");
   memory_init();
+  printm("boot_loader(dtb) is to be called...\n");
   boot_loader(dtb);
 }
 

@@ -384,19 +384,25 @@ static void plic_open(const struct fdt_scan_node *node, void *extra)
   scan->compat = 0;
   scan->reg = 0;
   scan->int_value = 0;
+  // printm("Initialized PLIC Scan Open\n");
 }
 
 static void plic_prop(const struct fdt_scan_prop *prop, void *extra)
 {
   struct plic_scan *scan = (struct plic_scan *)extra;
   if (!strcmp(prop->name, "compatible") && fdt_string_list_index(prop, "riscv,plic0") >= 0) {
+    // printm("Inside if statement for compatible...\n");
     scan->compat = 1;
   } else if (!strcmp(prop->name, "reg")) {
+    // printm("Inside if statement for reg...\n");
     fdt_get_address(prop->node->parent, prop->value, &scan->reg);
   } else if (!strcmp(prop->name, "interrupts-extended")) {
+    // printm("Inside if statement for interrupts-extended...\n");
+    printm("The value of int_value = %d\n",prop->value);
     scan->int_value = prop->value;
     scan->int_len = prop->len;
   } else if (!strcmp(prop->name, "riscv,ndev")) {
+    // printm("Inside if statement for riscv,ndev...\n");
     scan->ndev = bswap(prop->value[0]);
   }
 }
@@ -414,31 +420,46 @@ static void plic_done(const struct fdt_scan_node *node, void *extra)
 
   if (!scan->compat) return;
   assert (scan->reg != 0);
-  assert (scan->int_value && scan->int_len % 8 == 0);
+  printm("Pointer for scan->int_value : %x and int_len = %x\n",scan->int_value,scan->int_len);
+  assert (scan->int_value);
+  assert(scan->int_len % 8 == 0);
   assert (scan->ndev >= 0 && scan->ndev < 1024);
   assert (!scan->done); // only one plic
 
   scan->done = 1;
   plic_priorities = (uint32_t*)(uintptr_t)scan->reg;
+//  printm("%p \n",&scan->reg);
+  printm("%x \n",scan->reg);
   plic_ndevs = scan->ndev;
 
   for (int index = 0; end - value > 0; ++index) {
     uint32_t phandle = bswap(value[0]);
     uint32_t cpu_int = bswap(value[1]);
+    printm("cpu_int value : %d\n",cpu_int);
     int hart;
     for (hart = 0; hart < MAX_HARTS; ++hart)
       if (hart_phandles[hart] == phandle)
         break;
+    // die("Entering checking %d", hart);
     if (hart < MAX_HARTS) {
       hls_t *hls = OTHER_HLS(hart);
       if (cpu_int == IRQ_M_EXT) {
-        hls->plic_m_ie     = (uintptr_t*)((uintptr_t)scan->reg + ENABLE_BASE + ENABLE_SIZE * index);
-        hls->plic_m_thresh = (uint32_t*) ((uintptr_t)scan->reg + HART_BASE   + HART_SIZE   * index);
+        printm("Setting Machine Mode...\n");
+        printm("Value of reg is : %d\n",scan->reg);        
+	hls->plic_m_ie     = (uint32_t*)((uintptr_t)scan->reg + ENABLE_BASE + ENABLE_SIZE * index);
+  	
+	//printm("%x \n",hls->plic_m_ie);
+        
+	hls->plic_m_thresh = (uint32_t*) ((uintptr_t)scan->reg + HART_BASE   + HART_SIZE   * index);
       } else if (cpu_int == IRQ_S_EXT) {
-        hls->plic_s_ie     = (uintptr_t*)((uintptr_t)scan->reg + ENABLE_BASE + ENABLE_SIZE * index);
+        printm("Setting Supervisor Mode...\n");
+        printm("Value of reg is : %d\n",scan->reg);
+        hls->plic_s_ie     = (uint32_t*)((uintptr_t)scan->reg + ENABLE_BASE + ENABLE_SIZE * index);
+        printm("Completed hls->plic_s_ie \n");
         hls->plic_s_thresh = (uint32_t*) ((uintptr_t)scan->reg + HART_BASE   + HART_SIZE   * index);
+        printm("Completed hls->plic_s_thresh \n");
       } else {
-        printm("PLIC wired hart %d to wrong interrupt %d", hart, cpu_int);
+        printm("PLIC wired hart %d to wrong interrupt %d\n", hart, cpu_int);
       }
     }
     value += 2;
@@ -450,6 +471,7 @@ static void plic_done(const struct fdt_scan_node *node, void *extra)
     printm("CPU %d: %x %x %x %x\r\n", i, (uint32_t)(uintptr_t)hls->plic_m_ie, (uint32_t)(uintptr_t)hls->plic_m_thresh, (uint32_t)(uintptr_t)hls->plic_s_ie, (uint32_t)(uintptr_t)hls->plic_s_thresh);
   }
 #endif
+printm("PLIC Done function completed...\n");
 }
 
 void query_plic(uintptr_t fdt)
@@ -459,12 +481,16 @@ void query_plic(uintptr_t fdt)
 
   memset(&cb, 0, sizeof(cb));
   cb.open = plic_open;
+  printm("PLIC Open completed");
   cb.prop = plic_prop;
+  printm("PLIC Prop completed");
   cb.done = plic_done;
+  printm("PLIC Done completed");
   cb.extra = &scan;
 
   scan.done = 0;
   fdt_scan(fdt, &cb);
+  printm("FDT Scan completed...\n");
 }
 
 static void plic_redact(const struct fdt_scan_node *node, void *extra)
@@ -489,12 +515,16 @@ void filter_plic(uintptr_t fdt)
 
   memset(&cb, 0, sizeof(cb));
   cb.open = plic_open;
+  printm("PLIC Open completed\n");
   cb.prop = plic_prop;
+  printm("PLIC Prop completed\n");
   cb.done = plic_redact;
+  printm("PLIC redact completed\n");
   cb.extra = &scan;
 
   scan.done = 0;
   fdt_scan(fdt, &cb);
+  printm("FDT Scan over...\n");
 }
 
 //////////////////////////////////////////// COMPAT SCAN ////////////////////////////////////////

@@ -74,6 +74,19 @@ For instance Shakti C-Class is based on RV64IMAC. So alter the config file.
 Also once the above is done, please rebuild it.
 
 	cd linux-devkit
+
+To enable Ethernet support follow the below steps :
+
+The files to Configure linux for ethernet is in this repository. This has to be copied to the respective directory in order for the compiler to use while making.
+
+The config.txt is the configuration file for linux and should be copied to < linux-devkit path >/work/linux/ as .config
+
+The buildroot_initramfs-menuconfig.txt is the menuconfiguration for buildroot_initramfs and should be copied to < linux-devkit path >/work/buildroot_initramfs/ as .config
+
+The buildroot_rootfs-menuconfig.txt is the menuconfiguration for buildroot_initramfs and should be copied to < linux-devkit path >/work/buildroot_rootfs/ as .config
+
+The compilation of the linux is started using the following command in the linux-devkit repository.
+
 	make bbl
 
 Devlopment Cycle

@@ -33,6 +33,7 @@ void poweroff(uint16_t code)
   printm("Power off\n");
   finisher_exit(code);
   if (htif) {
+    printm("Calling htif_poweroff() function\n");
     htif_poweroff();
   } else {
     while (1);
@@ -87,6 +88,7 @@ static uintptr_t mcall_clear_ipi()
 
 static uintptr_t mcall_shutdown()
 {
+  printm("Inside mcall_shutdown function and going to shutdown...\n");
   poweroff(0);
 }
 
@@ -100,6 +102,7 @@ static uintptr_t mcall_set_timer(uint64_t when)
 
 static void send_ipi_many(uintptr_t* pmask, int event)
 {
+    printm("Inside send_ipi_many function");
   _Static_assert(MAX_HARTS <= 8 * sizeof(*pmask), "# harts > uintptr_t bits");
   uintptr_t mask = hart_mask;
   if (pmask)
@@ -133,13 +136,15 @@ void mcall_trap(uintptr_t* regs, uintptr_t mcause, uintptr_t mepc)
   write_csr(mepc, mepc + 4);
 
   uintptr_t n = regs[17], arg0 = regs[10], arg1 = regs[11], retval, ipi_type;
-
+  // printm("%d is the value of n in mcall_trap()\n",n);
   switch (n)
   {
     case SBI_CONSOLE_PUTCHAR:
+      // printm("Calling mcall_console_putchar() from switch in mcall_trap");
       retval = mcall_console_putchar(arg0);
       break;
     case SBI_CONSOLE_GETCHAR:
+      // printm("Calling mcall_console_getchar() from switch in mcall_trap");
       retval = mcall_console_getchar();
       break;
     case SBI_SEND_IPI:
@@ -152,13 +157,16 @@ void mcall_trap(uintptr_t* regs, uintptr_t mcause, uintptr_t mepc)
     case SBI_REMOTE_FENCE_I:
       ipi_type = IPI_FENCE_I;
 send_ipi:
+      // printm("Calling send_ipi_many() function...\n");
       send_ipi_many((uintptr_t*)arg0, ipi_type);
       retval = 0;
       break;
     case SBI_CLEAR_IPI:
+      // printm("Calling mcall_clear_ipi() from switch in mcall_trap");
       retval = mcall_clear_ipi();
       break;
     case SBI_SHUTDOWN:
+      // printm("Calling call_shutdown() from switch in mcall_trap");
       retval = mcall_shutdown();
       break;
     case SBI_SET_TIMER:
@@ -177,6 +185,7 @@ send_ipi:
 
 void redirect_trap(uintptr_t epc, uintptr_t mstatus, uintptr_t badaddr)
 {
+  printm("Inside redirect_trap...\n");
   write_csr(sbadaddr, badaddr);
   write_csr(sepc, epc);
   write_csr(scause, read_csr(mcause));
@@ -195,6 +204,8 @@ void redirect_trap(uintptr_t epc, uintptr_t mstatus, uintptr_t badaddr)
 
 void pmp_trap(uintptr_t* regs, uintptr_t mcause, uintptr_t mepc)
 {
+  printm("Inside pmp_trap() function\n");
+  printm("Calling redirect_trap() function...\n");
   redirect_trap(mepc, read_csr(mstatus), read_csr(mbadaddr));
 }
 
@@ -202,16 +213,21 @@ static void machine_page_fault(uintptr_t* regs, uintptr_t dummy, uintptr_t mepc)
 {
   // MPRV=1 iff this trap occurred while emulating an instruction on behalf
   // of a lower privilege level. In that case, a2=epc and a3=mstatus.
+  printm("Inside machine_page_fault function...\n");
+  printm("read_csr(mstatus) = %d\n",read_csr(mstatus));
   if (read_csr(mstatus) & MSTATUS_MPRV) {
     return redirect_trap(regs[12], regs[13], read_csr(mbadaddr));
   }
+  printm("Calling bad_trap from machine_page_fault\n");
   bad_trap(regs, dummy, mepc);
 }
 
 void trap_from_machine_mode(uintptr_t* regs, uintptr_t dummy, uintptr_t mepc)
 {
+  printm("Inside trap_machine_mode function\n");
   uintptr_t mcause = read_csr(mcause);
-
+  printm("mcause value is %x\n",mcause);
+  printm("mepc value is %x\n",mepc);
   switch (mcause)
   {
     case CAUSE_LOAD_PAGE_FAULT:
@@ -219,8 +235,10 @@ void trap_from_machine_mode(uintptr_t* regs, uintptr_t dummy, uintptr_t mepc)
     case CAUSE_FETCH_ACCESS:
     case CAUSE_LOAD_ACCESS:
     case CAUSE_STORE_ACCESS:
+      printm("Calling machine_page_fault...\n");
       return machine_page_fault(regs, dummy, mepc);
     default:
+      printm("Calling bad_trap from trap_from_machine_mode\n");
       bad_trap(regs, dummy, mepc);
   }
 }

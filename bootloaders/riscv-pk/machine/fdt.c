@@ -391,18 +391,13 @@ static void plic_prop(const struct fdt_scan_prop *prop, void *extra)
 {
   struct plic_scan *scan = (struct plic_scan *)extra;
   if (!strcmp(prop->name, "compatible") && fdt_string_list_index(prop, "riscv,plic0") >= 0) {
-    // printm("Inside if statement for compatible...\n");
     scan->compat = 1;
   } else if (!strcmp(prop->name, "reg")) {
-    // printm("Inside if statement for reg...\n");
     fdt_get_address(prop->node->parent, prop->value, &scan->reg);
   } else if (!strcmp(prop->name, "interrupts-extended")) {
-    // printm("Inside if statement for interrupts-extended...\n");
-    printm("The value of int_value = %d\n",prop->value);
     scan->int_value = prop->value;
     scan->int_len = prop->len;
   } else if (!strcmp(prop->name, "riscv,ndev")) {
-    // printm("Inside if statement for riscv,ndev...\n");
     scan->ndev = bswap(prop->value[0]);
   }
 }
@@ -427,8 +422,6 @@ static void plic_done(const struct fdt_scan_node *node, void *extra)
 
   scan->done = 1;
   plic_priorities = (uint32_t*)(uintptr_t)scan->reg;
-//  printm("%p \n",&scan->reg);
-  printm("%x \n",scan->reg);
   plic_ndevs = scan->ndev;
 
   for (int index = 0; end - value > 0; ++index) {
@@ -438,7 +431,6 @@ static void plic_done(const struct fdt_scan_node *node, void *extra)
     for (hart = 0; hart < MAX_HARTS; ++hart)
       if (hart_phandles[hart] == phandle)
         break;
-    // die("Entering checking %d", hart);
     if (hart < MAX_HARTS) {
       hls_t *hls = OTHER_HLS(hart);
       if (cpu_int == IRQ_M_EXT) { 

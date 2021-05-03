@@ -30,7 +30,6 @@ static uintptr_t mcall_console_putchar(uint8_t ch)
 
 void poweroff(uint16_t code)
 {
-  printm("Power off\n");
   finisher_exit(code);
   if (htif) {
     htif_poweroff();
@@ -133,7 +132,7 @@ void mcall_trap(uintptr_t* regs, uintptr_t mcause, uintptr_t mepc)
   write_csr(mepc, mepc + 4);
 
   uintptr_t n = regs[17], arg0 = regs[10], arg1 = regs[11], retval, ipi_type;
-
+  // printm("%d is the value of n in mcall_trap()\n",n);
   switch (n)
   {
     case SBI_CONSOLE_PUTCHAR:
@@ -211,7 +210,6 @@ static void machine_page_fault(uintptr_t* regs, uintptr_t dummy, uintptr_t mepc)
 void trap_from_machine_mode(uintptr_t* regs, uintptr_t dummy, uintptr_t mepc)
 {
   uintptr_t mcause = read_csr(mcause);
-
   switch (mcause)
   {
     case CAUSE_LOAD_PAGE_FAULT:

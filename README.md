@@ -74,6 +74,11 @@ For instance Shakti C-Class is based on RV64IMAC. So alter the config file.
 Also once the above is done, please rebuild it.
 
 	cd linux-devkit
+
+To enable Ethernet support follow the below steps :
+
+Change to 13-sos branch of the linux-devkit.
+
 	make bbl
 
 Devlopment Cycle

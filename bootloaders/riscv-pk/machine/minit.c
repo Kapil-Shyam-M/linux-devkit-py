@@ -35,7 +35,7 @@ static void mstatus_init()
     write_csr(sptbr, 0);
 }
 
-// send S-mode interrupts and most exceptions straight to S-mode
+// send S-mode intMSTATUS_MPRVerrupts and most exceptions straight to S-mode
 static void delegate_traps()
 {
   if (!supports_extension('S'))
@@ -96,8 +96,9 @@ static void hart_init()
 
 static void plic_init()
 {
-  for (size_t i = 1; i <= plic_ndevs; i++)
+  for (size_t i = 1; i <= plic_ndevs; i++){
     plic_priorities[i] = 1;
+  }
 }
 
 static void prci_test()
@@ -119,15 +120,24 @@ static void hart_plic_init()
   *HLS()->ipi = 0;
   *HLS()->timecmp = -1ULL;
   write_csr(mip, 0);
+  write_csr(sstatus,2);
+  write_csr(mstatus, 0xb);
+  write_csr(mie,0xbbb);
 
   if (!plic_ndevs)
     return;
 
   size_t ie_words = plic_ndevs / sizeof(uintptr_t) + 1;
-  for (size_t i = 0; i < ie_words; i++)
-    HLS()->plic_s_ie[i] = ULONG_MAX;
-  *HLS()->plic_m_thresh = 1;
-  *HLS()->plic_s_thresh = 0;
+
+  for (size_t i = 0; i < ie_words; i++){
+	  HLS()->plic_s_ie[i] = 0xffffffff;
+  }
+
+  *HLS()->plic_s_thresh = 1;
+
+/*  *HLS()->plic_s_thresh = 0;
+  printm("*HLS()->plic_s_thresh = 0;\n");
+  */
 }
 
 static void wake_harts()

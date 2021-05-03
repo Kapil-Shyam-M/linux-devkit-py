@@ -28,16 +28,61 @@
     device_type = "memory";
     reg = <0x0 0x80000000 0x0  0x10000000>;
   };
+  
   soc {
     #address-cells = <2>;
     #size-cells = <2>;
     compatible = "shakti,spike-bare-soc", "simple-bus";
     ranges;
-    clint@2000000 {
+    clint:clint@2000000 {
       compatible = "riscv,clint0";
       interrupts-extended = <&CPU0_intc 3 &CPU0_intc 7 >;
       reg = <0x0 0x2000000 0x0 0xc0000>;
     };
+    plic_0: interrupt-controller@c000000 {
+      #interrupt-cells = <2>;
+      compatible = "riscv,plic0";
+      interrupt-controller;
+      reg = <0x0 0xc000000 0x0 0x4000000>;
+      interrupts-extended = <&CPU0_intc 11 &CPU0_intc 9>; //11 as to mention MACHINE MODE for CPU or 9 for SUPERVISOR MODE for CPU...
+      reg-names = "control";
+      riscv,max-priority = <7>;
+      riscv,ndev = <29>;
+    };
+    ethernet: ethernet@44000{
+      #address-cells = <2>;
+      #size-cells = <2>;
+      device_type = "network";
+      compatible = "xlnx,xps-ethernetlite-3.00.a", "xlnx,xps-ethernetlite-1.00.a";
+      interrupt-parent = <&plic_0>;
+      interrupts = <29 0x1>;
+      local-mac-address = [00 0a 35 00 00 00];
+      phy-handle = <&phy1>;
+      reg = <0x0 0x44000 0x0 0x4000>;
+      xlnx,duplex = <0x1>;
+      xlnx,include-global-buffers = <0x1>;
+      xlnx,include-internal-loopback = <0x1>;
+      xlnx,include-mdio = <0x1>;
+      xlnx,instance = "axi_ethernetlite_inst";
+      xlnx,rx-ping-pong = <0x1>;
+      xlnx,s-axi-id-width = <0x1>;
+      xlnx,tx-ping-pong = <0x1>;
+      threshold = <0x40>;
+      sensitivity = <6>;
+      axi_ethernetlite_0_mdio: mdio {
+        #address-cells = <0x1>;
+        #size-cells = <0x0>;
+        phy1: phy@1{
+          device_type = "ethernet-phy";
+          compatible = "ethernet-phy-ieee802.3-c22";
+          ti,rx-internal-delay = <1000000000>;
+          ti,tx-internal-delay = <1000000000>;
+          ti,fifo-depth = <0x1000>;
+          reg = <1>;
+          status = "okay";
+        };
+     };
+   };
   };
  uart {
   compatible = "shakti,uart0";

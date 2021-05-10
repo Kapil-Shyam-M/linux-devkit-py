@@ -39,7 +39,7 @@
       interrupts-extended = <&CPU0_intc 3 &CPU0_intc 7 >;
       reg = <0x0 0x2000000 0x0 0xc0000>;
     };
-    plic_0: interrupt-controller@c000000 {
+    plic: interrupt-controller@c000000 {
       #interrupt-cells = <2>;
       compatible = "riscv,plic0";
       interrupt-controller;
@@ -54,7 +54,7 @@
       #size-cells = <2>;
       device_type = "network";
       compatible = "xlnx,xps-ethernetlite-3.00.a", "xlnx,xps-ethernetlite-1.00.a";
-      interrupt-parent = <&plic_0>;
+      interrupt-parent = <&plic>;
       interrupts = <29 0x1>;
       local-mac-address = [00 0a 35 00 00 00];
       phy-handle = <&phy1>;
@@ -82,6 +82,19 @@
           status = "okay";
         };
      };
+   };
+   clock: oscillator {
+     #clock-cells = <0>;
+     compatible = "fixed-clock";
+     clock-frequency = <50000000>;
+   };
+   spi:spi@20100{
+     compatible = "sk,vajra-sspi";
+     reg = <0x0 0x20100 0x0 0x100>;
+     shakti,clock-frequency = <50000000>;
+     clocks = <&clock>;
+     shakti,max-bits-per-word = <0x8>;
+     shakti,fifo-depth = <0x4>;
    };
   };
  uart {

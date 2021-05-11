@@ -89,7 +89,7 @@
      clock-frequency = <50000000>;
    };
    spi:spi@20100{
-     compatible = "sk,vajra-sspi";
+     compatible = "shakti,spi1";
      reg = <0x0 0x20100 0x0 0x100>;
      shakti,clock-frequency = <50000000>;
      clocks = <&clock>;

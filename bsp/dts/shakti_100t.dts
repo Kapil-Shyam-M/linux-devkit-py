@@ -91,10 +91,11 @@
    spi:spi@20100{
      compatible = "shakti,spi1";
      reg = <0x0 0x20100 0x0 0x100>;
-     shakti,clock-frequency = <50000000>;
      clocks = <&clock>;
-     shakti,max-bits-per-word = <0x8>;
-     shakti,fifo-depth = <0x4>;
+     shakti,controller = <1>;  // 1 for MASTER and 0 for SLAVE...
+     shakti,spi-frequency = <10000000>;
+     shakti,lsb-first = <0x0>;   // 1 for LSB first and 0 for MSB first... 
+     shakti,communication-mode = <0x3>; // Communication Mode 0-3 value. Other values cause the driver to fail.
    };
   };
  uart {

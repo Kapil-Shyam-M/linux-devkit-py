@@ -93,7 +93,7 @@
      reg = <0x0 0x20100 0x0 0x100>;
      clocks = <&clock>;
      shakti,controller = <1>;                  // 1 for MASTER and 0 for SLAVE...
-     shakti,spi-frequency = <10000000>;
+     shakti,spi-frequency = <500000>;
      shakti,lsb-first = <0x0>;                 // 1 for LSB first and 0 for MSB first... 
      shakti,communication-mode = <0x3>;        // Communication Mode 0-3 value. Other values cause the driver to fail.
      shakti,cpha = <0x0>;

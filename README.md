@@ -75,11 +75,22 @@ Also once the above is done, please rebuild it.
 
 	cd linux-devkit
 
-To enable Ethernet support follow the below steps :
+To enable SD Card support follow the below steps :
 
-Change to 13-sos branch of the linux-devkit.
+Change to sd-support branch of the linux-devkit.
+
+Add the following line at the end in the fstab file present at buildroot/package/skeleton-init-sysv/skeleton/etc
+
+	devtmpfs	/dev		devtmpfs mode=1777,nouid	0	0
+
+The above line is to make the devtmpfs auto-mount to /dev during bootup. This can be avoid if you can mount the file-system in the terminal using
+
+	mount -t devtmpfs devtmpfs /dev
+
+To start the compilation use the following command 
 
 	make bbl
+
 
 Devlopment Cycle
 -----

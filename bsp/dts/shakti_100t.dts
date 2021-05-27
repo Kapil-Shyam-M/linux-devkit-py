@@ -99,6 +99,7 @@
      shakti,cpha = <0x0>;			 // Clock Phase
      shakti,cpol = <0x0>;			 // Clock Polarity
      shakti,cs-high = <0x1>;			// Chip-select active
+     shakti,fifo-depth = <16>;			// The FIFO length value in bytes (32 level cannot be used here).
      mmc-slot@0 {
        compatible = "mmc-spi-slot";
        reg = <0>;

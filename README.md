@@ -75,7 +75,7 @@ Also once the above is done, please rebuild it.
 
 	cd linux-devkit
 
-To enable SD Card support follow the below steps :
+To enable SD Card support follow the below 2 steps :
 
 Add the following line at the end in the fstab file present at buildroot/package/skeleton-init-sysv/skeleton/etc
 

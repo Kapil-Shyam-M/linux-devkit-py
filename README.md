@@ -85,6 +85,8 @@ The above line is to make the devtmpfs auto-mount to /dev during bootup. This ca
 
 	mount -t devtmpfs devtmpfs /dev
 
+The SD Card is tested to work fine with the operational SPI frequency of 2Mhz.
+
 To start the compilation use the following command 
 
 	make bbl

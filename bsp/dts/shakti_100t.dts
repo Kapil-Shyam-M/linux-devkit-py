@@ -93,18 +93,18 @@
      reg = <0x0 0x20100 0x0 0x100>;
      clocks = <&clock>;			// Reference to Hardware Clock
      shakti,controller = <1>;                  // 1 for MASTER and 0 for SLAVE...
-     shakti,spi-frequency = <1000000>;	// SPI Working Frequency
+     shakti,spi-frequency = <2000000>;	// SPI Working Frequency
      shakti,lsb-first = <0x0>;                 // 1 for LSB first and 0 for MSB first... 
      shakti,communication-mode = <0x3>;        // Communication Mode 0-3 value. Other values cause the driver to fail.
      shakti,cpha = <0x0>;			 // Clock Phase
      shakti,cpol = <0x0>;			 // Clock Polarity
      shakti,cs-high = <0x1>;			// Chip-select active
-     shakti,fifo-depth = <16>;			// The FIFO length value in bytes (32 level cannot be used here).
+     shakti,fifo-depth = <31>;			// The FIFO length value in bytes (32 level cannot be used here).
      mmc-slot@0 {
        compatible = "mmc-spi-slot";
        reg = <0>;
        voltage-ranges = <3300 3300>;
-       spi-max-frequency = <1500000>;  	 // This value should be greater than shakti,spi-frequency
+       spi-max-frequency = <2500000>;  	 // This value should be greater than shakti,spi-frequency
      };
    };
   };

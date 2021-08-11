@@ -87,10 +87,25 @@ The above line is to make the devtmpfs auto-mount to /dev during bootup. This ca
 
 The SD Card is tested to work fine with the operational SPI frequency of 2Mhz.
 
-To start the compilation use the following command 
+To start the compilation of the BBL use the following command 
 
 	make bbl
+	
+To start the compilation for SD Card Images use the following command
 
+	make image
+	
+After compilation a directory named 'Output' will be created in linux-devkit directory. The Output directory will contain the images of :
+
+	uImage - The Linux Kernel Image compatible with U-Boot.
+	rootfs.tar - The Root File System which needs to be extracted on SD Card. Use the following command : tar -xvf rootfs.tar -C /mnt/card
+	shakti_100t.dtb - The device tree blob which is used by the Linux Kernel.
+	fw_payload.elf - The U-Boot bootloaders ELF image (Can be started in GDB).
+	fw_payload.bin - The Binary image of U-Boot bootloader.
+	
+In the SD Card format it to ext4 filesystem and extract the rootfs.tar in the first partition of the disk. Create another directory called as "boot" in the first partiton of the disk and copy uImage and shakti_100t.dtb from the Output directory generated to the "boot" directory created.
+
+To start Linux from SD Card, Start the fw_payload.elf through GDB and enter "Boot" in the prompt.
 
 Devlopment Cycle
 -----
@@ -115,7 +130,7 @@ Assuming you have programmed the board and ready to deploy the bbl follow the be
 
 Open Three terminals,
 1. Miniterm	
-2. OpenOcd
+2. OpenOCD
 3. RISC-V GDB
 
 * Connect to the board using openocd with shakti-sdk

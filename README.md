@@ -77,6 +77,8 @@ Also once the above is done, please rebuild it.
 
 To enable SD Card support follow the below 2 steps :
 
+Checkout the uboot repo under bootloaders to sd-support-u-boot branch and shakti-opensbi directory to quikproto.
+
 Add the following line at the end in the fstab file present at buildroot/package/skeleton-init-sysv/skeleton/etc
 
 	devtmpfs	/dev		devtmpfs mode=1777,nouid	0	0
@@ -107,7 +109,7 @@ In the SD Card format it to ext4 filesystem and extract the rootfs.tar in the fi
 
 To start Linux from SD Card, Start the fw_payload.elf through GDB and enter "Boot" in the prompt.
 
-Devlopment Cycle
+Development Cycle
 -----
 
 The Linux Development Kit has the  following Directories 

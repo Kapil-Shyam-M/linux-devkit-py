@@ -3,7 +3,7 @@
 	url = https://github.com/buildroot/buildroot.git
 [submodule "linux-on-shakti"]
 	path = linux-on-shakti
-	url = https://gitlab.com/shaktiproject/software/linux-on-shakti
+	url = https://github.com/Xilinx/linux-xlnx
 [submodule "bootloaders/shakti-opensbi"]
 	path = bootloaders/shakti-opensbi
 	url = https://gitlab.com/shaktiproject/software/shakti-opensbi

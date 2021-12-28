@@ -19,8 +19,10 @@ size_t plic_ndevs;
 static void mstatus_init()
 {
   // Enable FPU
-  if (supports_extension('D') || supports_extension('F'))
+  if (supports_extension('D') || supports_extension('F')){
     write_csr(mstatus, MSTATUS_FS);
+    printm("Supports F or D or both...\n");
+  }
 
   // Enable user/supervisor use of perf counters
   if (supports_extension('S'))
@@ -33,6 +35,7 @@ static void mstatus_init()
   // Disable paging
   if (supports_extension('S'))
     write_csr(sptbr, 0);
+  printm("The value of mstatus id %x(Hex)\n",read_csr(mstatus));
 }
 
 // send S-mode intMSTATUS_MPRVerrupts and most exceptions straight to S-mode
@@ -199,9 +202,13 @@ void enter_supervisor_mode(void (*fn)(uintptr_t), uintptr_t arg0, uintptr_t arg1
 */
  
   uintptr_t mstatus = read_csr(mstatus);
+  printm("The value of mstatus at the enter of enter_supervisor_mode is %x(Hex)\n",mstatus);
   mstatus = INSERT_FIELD(mstatus, MSTATUS_MPP, PRV_S);
   mstatus = INSERT_FIELD(mstatus, MSTATUS_MPIE, 0);
+  mstatus = mstatus | 0x2000;//INSERT_FIELD(mstatus, MSTATUS_FS, 1);
   write_csr(mstatus, mstatus);
+  // write_csr(mstatus, read_csr(mstatus)|0x6000);
+  printm("The value of mstatus id %x(Hex)\n",mstatus);
   write_csr(mscratch, MACHINE_STACK_TOP() - MENTRY_FRAME_SIZE);
   write_csr(mepc, fn);
 

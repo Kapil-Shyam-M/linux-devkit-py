@@ -164,6 +164,12 @@
 #define PTE_D     0x080 // Dirty
 #define PTE_SOFT  0x300 // Reserved for Software
 
+#define CAUSE_FETCH_GUEST_PAGE_FAULT	0x14
+#define CAUSE_LOAD_GUEST_PAGE_FAULT	0x15
+#define CAUSE_VIRTUAL_INST_FAULT	0x16
+#define CAUSE_STORE_GUEST_PAGE_FAULT	0x17
+// #define CAUSE_SUPERVISOR_ECALL		0xa
+
 #define PTE_PPN_SHIFT 10
 
 #define PTE_TABLE(PTE) (((PTE) & (PTE_V | PTE_R | PTE_W | PTE_X)) == PTE_V)

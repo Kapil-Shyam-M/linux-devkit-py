@@ -41,7 +41,10 @@ static void delegate_traps()
   if (!supports_extension('S'))
     return;
 
-  uintptr_t interrupts = MIP_SSIP | MIP_STIP | MIP_SEIP;
+  uintptr_t v1 = read_csr(mideleg), v2 = read_csr(mideleg);
+  printm("The value of v1 and v2 are %x and %x\n",v1,v2);
+
+  uintptr_t interrupts = MIP_SSIP | MIP_STIP | MIP_SEIP ;//| MIP_HEIP | MIP_HTIP | MIP_HSIP;
   uintptr_t exceptions =
     (1U << CAUSE_MISALIGNED_FETCH) |
     (1U << CAUSE_FETCH_PAGE_FAULT) |
@@ -51,8 +54,24 @@ static void delegate_traps()
     (1U << CAUSE_BREAKPOINT) |
     (1U << CAUSE_USER_ECALL);
 
+  /*
+	 * If hypervisor extension available then we only handle hypervisor
+	 * calls (i.e. ecalls from HS-mode) in M-mode.
+	 *
+	 * The HS-mode will additionally handle supervisor calls (i.e. ecalls
+	 * from VS-mode), Guest page faults and Virtual interrupts.
+	 */
+	if (supports_extension('H')) {
+		exceptions |= (1U << CAUSE_SUPERVISOR_ECALL);
+		exceptions |= (1U << CAUSE_FETCH_GUEST_PAGE_FAULT);
+		exceptions |= (1U << CAUSE_LOAD_GUEST_PAGE_FAULT);
+		exceptions |= (1U << CAUSE_VIRTUAL_INST_FAULT);
+		exceptions |= (1U << CAUSE_STORE_GUEST_PAGE_FAULT);
+	}
+  printm("[INFO-BEFORE]The value of mideleg and medeleg are %x and %x\n",read_csr(mideleg),read_csr(medeleg));
   write_csr(mideleg, interrupts);
   write_csr(medeleg, exceptions);
+  printm("[INFO-AFTER]The value of mideleg and medeleg are %x and %x while interrupt is %x\n",read_csr(mideleg),read_csr(medeleg),interrupts);
   assert(read_csr(mideleg) == interrupts);
   assert(read_csr(medeleg) == exceptions);
 }

@@ -24,20 +24,20 @@ Setting up the Build Enviroment
 
 This repository uses submodules. You need the --recursive option to fetch the submodules automatically
 
-    $ git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
+      git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
     
 Alternatively :
 
-    $ git clone https://github.com/riscv/riscv-gnu-toolchain
-    $ cd riscv-gnu-toolchain
-    $ git submodule update --init --recursive
+      git clone https://github.com/riscv/riscv-gnu-toolchain
+      cd riscv-gnu-toolchain
+      git submodule update --init --recursive
 
 2. Install the necessary packages
 
 Several standard packages are needed to build the toolchain.  On Ubuntu,
 executing the following command should suffice:
 
-    $ sudo apt-get install autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev
+      sudo apt-get install autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev
 
 3. Install the toolchain by doing 
 
@@ -55,7 +55,7 @@ Getting started on linux Devlopment
 --
 The linux development repository uses submodules. You need the --recursive option to fetch the submodules automatically
             
-     $ git clone --recursive https://gitlab.com/M_Kapil_Shyam/linux-devkit.git
+       git clone --recursive https://github.com/Kapil_Shyam_M/linux-devkit-py.git
             
 The development package Supports C-Class 64bit Core,which boots linux on top of Proxy Kernel.
 
@@ -70,6 +70,16 @@ For instance Shakti C-Class is based on RV64IMAC. So alter the config file.
 
     CONFIG_EXTRA_CFLAGS="-g -march=rv64imac -mabi=lp64"
     CONFIG_EXTRA_LDFLAGS="-g -march=rv64imac -mabi=lp64"
+
+Now, in linux-devkit-py/linux-on-shakti/scripts/dtc/dtc-lexer.l , modify line number 26 as,
+
+    extern YYLTYPE yylloc;
+
+Also once the above is done, open new terminal, and do the following commands:
+
+        cd linux-devkit/buildroot
+	
+	git checkout 2021.05.x
 
 Also once the above is done, please rebuild it.
 
@@ -105,24 +115,24 @@ Open Three terminals,
 
 * Connect to the board using openocd with shakti-sdk
 
-     $ cd ~/shakti-sdk/bsp/third_party/vajra <br />
-     $ sudo $(which openocd) -f ftdi.cfg <br />
+      cd ~/shakti-sdk/bsp/third_party/vajra <br />
+      sudo $(which openocd) -f ftdi.cfg <br />
      
 * Connect to gtkterm or minicom or miniterm with a baudrate of 19200 and port as /dev/ttyUSB
 
-     $ sudo miniterm.py /dev/ttyUSB1 19200 <br />
+      sudo miniterm.py /dev/ttyUSB1 19200 <br />
     
 * Using gdb(riscv64-unknown-elf-gdb) load the bbl , steps are given below.
 
-     ​(gdb) set remotetimeout unlimited <br />
-     (gdb) ​target remote localhost:3333 <br />
-     (gdb) file path/to/linux-devkit/bootloaders/riscv-pk/build/bbl <br />
-     (gdb) load	<br />
+      (gdb) set remotetimeout unlimited <br />
+      (gdb) target remote localhost:3333 <br />
+      (gdb) file path/to/linux-devkit-py/bootloaders/riscv-pk/build/bbl <br />
+      (gdb) load	<br />
 
 
 * Once done inspect the memory at 0x80000000 to check if the image is loaded properly. 
 
-     (gdb) x/10x 0x80000000
+      (gdb) x/10x 0x80000000
 
 GDB after load,
 

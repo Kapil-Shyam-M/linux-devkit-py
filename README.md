@@ -55,7 +55,7 @@ Getting started on linux Devlopment
 --
 The linux development repository uses submodules. You need the --recursive option to fetch the submodules automatically
             
-     $ git clone --recursive https://gitlab.com/shaktiproject/software/linux-devkit.git
+     $ git clone --recursive https://gitlab.com/M_Kapil_Shyam/linux-devkit.git
             
 The development package Supports C-Class 64bit Core,which boots linux on top of Proxy Kernel.
 
@@ -148,36 +148,6 @@ Linux with minimal filesystem (miniterm)
 -----
 ![file](https://user-images.githubusercontent.com/31366212/83849300-d6a8ae80-a72c-11ea-92e2-11d74d098487.png)
 
-Using Simulator to Boot linux
------
-    
-Verilog artifacts
-----
-Download the verilog artifacts from [here](https://gitlab.com/shaktiproject/cores/c-class/-/jobs/345774982/artifacts/download)
-
-Convert to hex using elf2hex
----
-
-Follow the instructions in the below link to install riscv-isa-sim. This will give elf2hex binary which we will be using later.
-
-    https://github.com/riscv/riscv-isa-sim/blob/master/README.md
-
-Note: set $RISCV to the install path of toolchain. Example: export RISCV=/opt/riscv
-
-Simulation
----
-Extract the verilog-artifacts
-
-    $ unzip verilog-artifacts.zip  
-
-Copy the bbl binary and start the simulation.
-
-    $ cd verilog-artifacts/sim  
-    $ cp <linux-dev location>/work/riscv-pk/build/bbl ./  
-    $ elf2hex 8 33554432 bbl 2147483648 > code.mem  
-    $ ./cclass
-
-The output will be gernerated in a text file "app_log" , make use of tail method to recursively see generated log.
 
 Sample Debug Log 
 ---

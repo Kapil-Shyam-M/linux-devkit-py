@@ -62,11 +62,15 @@ The development package Supports C-Class 64bit Core,which boots linux on top of 
 
 Rapid deployment using BBL as a bootloader
 --
-Linux can be built as a payload to BBL by doing the below command.   
+Linux can be built as a payload to BBL by doing the below command.  
+
+        cd linux-devkit-py
+
+	make bbl
 
 For instance Shakti C-Class is based on RV64IMAC. So alter the config file.
 
-    Location : <Your linux-devkit dir>/buildroot/package/busybox/busybox.config
+    Location : <Your linux-devkit-py dir>/buildroot/package/busybox/busybox.config
 
     CONFIG_EXTRA_CFLAGS="-g -march=rv64imac -mabi=lp64"
     CONFIG_EXTRA_LDFLAGS="-g -march=rv64imac -mabi=lp64"
@@ -77,13 +81,13 @@ Now, in linux-devkit-py/linux-on-shakti/scripts/dtc/dtc-lexer.l , modify line nu
 
 Also once the above is done, open new terminal, and do the following commands:
 
-        cd linux-devkit/buildroot
+        cd linux-devkit-py/buildroot
 	
 	git checkout 2021.05.x
 
 Also once the above is done, please rebuild it.
 
-	cd linux-devkit
+	cd linux-devkit-py
 
 	make bbl
 

@@ -134,7 +134,7 @@ static void run_loaded_program(size_t argc, char** argv, uintptr_t kstack_top)
 
   trapframe_t tf;
   init_tf(&tf, current.entry, stack_top);
-  __clear_cache(0, 0);
+  asm volatile ("fence.i");
   write_csr(sscratch, kstack_top);
   start_user(&tf);
 }

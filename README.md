@@ -165,3 +165,9 @@ Sample Debug Log
 
 
 note: If you have already installed toolchain, please use it appropriately.
+
+## FAQ
+1. Error: You seem to have the current working directory in your
+   LD_LIBRARY_PATH environment variable. This doesn't work.
+
+Ans: ``` $ unset LD_LIBRARY_PATH ```

@@ -75,6 +75,9 @@ For instance Shakti C-Class is based on RV64IMAC. So alter the config file.
     CONFIG_EXTRA_CFLAGS="-g -march=rv64imac -mabi=lp64"
     CONFIG_EXTRA_LDFLAGS="-g -march=rv64imac -mabi=lp64"
 
+    +CONFIG_EXTRA_CFLAGS="-Os -march=rv64imac -mabi=lp64 -mcmodel=medany"
+    +CONFIG_EXTRA_LDFLAGS="-Os -march=rv64imac -mabi=lp64 -mcmodel=medany"
+
 Now, in linux-devkit-py/linux-on-shakti/scripts/dtc/dtc-lexer.l , modify line number 26 as,
 
     extern YYLTYPE yylloc;
@@ -83,7 +86,7 @@ Also once the above is done, open new terminal, and do the following commands:
 
         cd linux-devkit-py/buildroot
 	
-	git checkout 2021.05.x
+	git checkout 2022.11.x
 
 Also once the above is done, please rebuild it.
 
